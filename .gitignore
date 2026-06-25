@@ -6,3 +6,5 @@ outputs/
 .vercel/
 .env
 npm-debug.log*
+
+.vercel
