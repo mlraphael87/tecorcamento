@@ -11,6 +11,7 @@ const dataDir = path.join(__dirname, "data");
 const dbPath = path.join(dataDir, "orcamentos.sqlite");
 const usePostgres = Boolean(process.env.POSTGRES_URL || process.env.POSTGRES_PRISMA_URL);
 const canUseSqlite = !usePostgres && !process.env.VERCEL;
+let dbInitError = null;
 
 fs.mkdirSync(dataDir, { recursive: true });
 const sqliteDb = canUseSqlite ? new (require("sqlite3").verbose().Database)(dbPath) : null;
@@ -28,7 +29,8 @@ function toPgSql(sql) {
 
 async function initDb() {
   if (!usePostgres && process.env.VERCEL) {
-    throw new Error("POSTGRES_URL nao configurada. Configure um banco PostgreSQL na Vercel para usar a aplicacao online.");
+    dbInitError = new Error("POSTGRES_URL nao configurada. Configure um banco PostgreSQL na Vercel para usar a aplicacao online.");
+    return;
   }
 
   if (usePostgres) {
@@ -122,6 +124,7 @@ app.use((request, response, next) => {
 app.use(express.static(path.join(__dirname, "public")));
 
 function run(sql, params = []) {
+  if (dbInitError) throw dbInitError;
   if (usePostgres) {
     return pgPool.query(toPgSql(sql), params).then((result) => ({ lastID: result.rows[0]?.id }));
   }
@@ -134,6 +137,7 @@ function run(sql, params = []) {
 }
 
 function get(sql, params = []) {
+  if (dbInitError) throw dbInitError;
   if (usePostgres) {
     return pgPool.query(toPgSql(sql), params).then((result) => result.rows[0]);
   }
@@ -143,6 +147,7 @@ function get(sql, params = []) {
 }
 
 function all(sql, params = []) {
+  if (dbInitError) throw dbInitError;
   if (usePostgres) {
     return pgPool.query(toPgSql(sql), params).then((result) => result.rows);
   }
