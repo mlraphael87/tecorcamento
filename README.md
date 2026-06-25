@@ -22,6 +22,6 @@ Para producao, defina:
 
 - `APP_USER`: usuario de acesso
 - `APP_PASSWORD`: senha de acesso
-- `POSTGRES_URL`: URL de conexao PostgreSQL para historico persistente online
+- `POSTGRES_URL` ou `DATABASE_URL`: URL de conexao PostgreSQL para historico persistente online
 
 Sem `POSTGRES_URL`, a aplicacao usa SQLite local em `data/orcamentos.sqlite`.

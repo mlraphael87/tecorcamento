@@ -9,7 +9,8 @@ const appUser = process.env.APP_USER || "admin";
 const appPassword = process.env.APP_PASSWORD || "orcamento";
 const dataDir = path.join(__dirname, "data");
 const dbPath = path.join(dataDir, "orcamentos.sqlite");
-const usePostgres = Boolean(process.env.POSTGRES_URL || process.env.POSTGRES_PRISMA_URL);
+const postgresUrl = process.env.POSTGRES_URL || process.env.POSTGRES_PRISMA_URL || process.env.DATABASE_URL;
+const usePostgres = Boolean(postgresUrl);
 const canUseSqlite = !usePostgres && !process.env.VERCEL;
 let dbInitError = null;
 
@@ -17,8 +18,8 @@ fs.mkdirSync(dataDir, { recursive: true });
 const sqliteDb = canUseSqlite ? new (require("sqlite3").verbose().Database)(dbPath) : null;
 const pgPool = usePostgres
   ? new Pool({
-      connectionString: process.env.POSTGRES_URL || process.env.POSTGRES_PRISMA_URL,
-      ssl: process.env.POSTGRES_URL?.includes("localhost") ? false : { rejectUnauthorized: false },
+      connectionString: postgresUrl,
+      ssl: postgresUrl.includes("localhost") ? false : { rejectUnauthorized: false },
     })
   : null;
 
