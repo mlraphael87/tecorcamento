@@ -1,0 +1,209 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Orcamentos TEC</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <main class="app-shell">
+      <section class="workspace">
+        <aside class="panel">
+          <div class="panel__header">
+            <div>
+              <p class="eyebrow">TEC Assistencia Tecnica</p>
+              <h1>Orcamentos</h1>
+            </div>
+            <button class="icon-button" id="refreshOs" type="button" title="Atualizar numero da OS">↻</button>
+          </div>
+
+          <form id="budgetForm" class="form-grid">
+            <label>
+              <span>OS</span>
+              <input id="os_numero" name="os_numero" inputmode="numeric" required />
+            </label>
+            <label>
+              <span>Data</span>
+              <input id="data" name="data" type="date" required />
+            </label>
+            <label class="span-2">
+              <span>Paciente</span>
+              <input id="paciente" name="paciente" required autocomplete="name" />
+            </label>
+            <label>
+              <span>CPF</span>
+              <input id="cpf" name="cpf" inputmode="numeric" />
+            </label>
+            <label>
+              <span>Contato</span>
+              <input id="contato" name="contato" />
+            </label>
+            <label>
+              <span>Origem</span>
+              <input id="origem" name="origem" />
+            </label>
+            <label>
+              <span>Nascimento</span>
+              <input id="nascimento" name="nascimento" type="date" />
+            </label>
+            <label>
+              <span>Concessao</span>
+              <input id="concessao" name="concessao" type="date" />
+            </label>
+            <label class="span-2 group-title">Aparelho 1</label>
+            <label>
+              <span>Fabricante 1</span>
+              <input id="fabricante" name="fabricante" list="fabricantes" required />
+              <datalist id="fabricantes">
+                <option value="PHONAK"></option>
+                <option value="REXTON"></option>
+                <option value="OTICON"></option>
+                <option value="SIGNIA"></option>
+              </datalist>
+            </label>
+            <label>
+              <span>Modelo 1</span>
+              <input id="modelo" name="modelo" required />
+            </label>
+            <label>
+              <span>Numero de serie 1</span>
+              <input id="serie" name="serie" required />
+            </label>
+            <label>
+              <span>Observacao 1</span>
+              <input id="observacao" name="observacao" placeholder="Ex.: AASI MUDO" />
+            </label>
+            <label class="span-2 group-title">Aparelho 2</label>
+            <label>
+              <span>Fabricante 2</span>
+              <input id="fabricante2" name="fabricante2" list="fabricantes" />
+            </label>
+            <label>
+              <span>Modelo 2</span>
+              <input id="modelo2" name="modelo2" />
+            </label>
+            <label>
+              <span>Numero de serie 2</span>
+              <input id="serie2" name="serie2" />
+            </label>
+            <label>
+              <span>Observacao 2</span>
+              <input id="observacao2" name="observacao2" />
+            </label>
+            <label class="span-2">
+              <span>Servico</span>
+              <input id="servico" name="servico" required placeholder="Ex.: TROCA DE RECEPTOR" />
+            </label>
+            <label class="span-2">
+              <span>Pecas</span>
+              <input id="pecas" name="pecas" placeholder="Opcional" />
+            </label>
+            <label>
+              <span>Custo total</span>
+              <input id="valor_total" name="valor_total" inputmode="decimal" required placeholder="1500,00" />
+            </label>
+            <label class="span-2">
+              <span>Valor por extenso</span>
+              <input id="valor_extenso" name="valor_extenso" />
+            </label>
+            <div class="actions span-2">
+              <button type="submit" class="primary">Salvar orçamento</button>
+              <button type="button" id="printButton">Imprimir / baixar PDF</button>
+              <button type="button" id="newButton">Novo</button>
+            </div>
+            <div id="status" class="status span-2" role="status" aria-live="polite"></div>
+          </form>
+        </aside>
+
+        <section class="preview-section">
+          <div class="toolbar">
+            <label class="search">
+              <span>Consultar</span>
+              <input id="searchInput" placeholder="Paciente, OS, origem, serie..." />
+            </label>
+            <select id="historySelect" aria-label="Orcamentos salvos">
+              <option value="">Historico salvo</option>
+            </select>
+          </div>
+
+          <article id="printArea" class="sheet" aria-label="Previa do orcamento">
+            <header class="doc-header">
+              <div class="brand">
+                <span class="brand-main">TEC</span>
+                <span class="brand-sub">Assistencia Tecnica - Aparelhos Auditivos</span>
+              </div>
+              <div class="company-line">
+                TEC - ASSISTENCIA TECNICA &nbsp;&nbsp;&nbsp; CNPJ 04.302.557/0001-38 &nbsp;&nbsp;&nbsp; CRFa 6a - PJ 10147
+              </div>
+            </header>
+
+            <div class="title">ORCAMENTO</div>
+
+            <section class="meta-lines">
+              <div><span>OS NR:</span> <strong id="p_os">0126</strong></div>
+              <div><span>DATA :</span> <strong id="p_data">29/05/2026</strong></div>
+            </section>
+
+            <section class="patient-grid">
+              <div class="label">PACIENTE:</div>
+              <div class="value wide" id="p_paciente"></div>
+              <div class="right-label">CPF :</div>
+              <div class="value compact" id="p_cpf"></div>
+              <div class="label">CONTATO:</div>
+              <div class="value wide" id="p_contato"></div>
+              <div class="right-label">Nasc.</div>
+              <div class="value compact" id="p_nascimento"></div>
+              <div class="label">ORIGEM:</div>
+              <div class="value wide" id="p_origem"></div>
+              <div class="right-label">Concessao:</div>
+              <div class="value compact" id="p_concessao"></div>
+            </section>
+
+            <section class="device-block">
+              <div class="section-title">APARELHO AUDITIVO</div>
+              <div class="device-table">
+                <div class="th">NR SERIE</div>
+                <div class="th">MODELO</div>
+                <div class="th">FABRIC.</div>
+                <div class="th merged">OBSERVACAO</div>
+                <div class="td" id="p_serie"></div>
+                <div class="td" id="p_modelo"></div>
+                <div class="td" id="p_fabricante"></div>
+                <div class="td merged" id="p_observacao"></div>
+                <div class="td" id="p_serie2"></div>
+                <div class="td" id="p_modelo2"></div>
+                <div class="td" id="p_fabricante2"></div>
+                <div class="td merged" id="p_observacao2"></div>
+              </div>
+            </section>
+
+            <section class="services">
+              <div class="service-title">SERVICOS:</div>
+              <div class="service-copy" id="p_servico"></div>
+              <div class="pieces-copy" id="p_pecas"></div>
+            </section>
+
+            <section class="total-line">
+              <div>CUSTO TOTAL :</div>
+              <strong id="p_valor">R$ 0,00</strong>
+              <span id="p_extenso"></span>
+            </section>
+
+            <section class="footer-art">
+              <img src="/assets/aparelho.jpeg" alt="" />
+            </section>
+
+            <footer class="doc-footer">
+              <div>Av. do CPA, 2000, sala 806, Jardim Aclimacao - Cel (65) 99236 4617</div>
+              <div>e-mail - pl.audi@terra.com.br</div>
+              <div>Cuiaba - MT</div>
+            </footer>
+          </article>
+        </section>
+      </section>
+    </main>
+
+    <script src="/app.js"></script>
+  </body>
+</html>
