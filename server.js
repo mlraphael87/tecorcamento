@@ -1,7 +1,6 @@
 const express = require("express");
 const path = require("path");
 const fs = require("fs");
-const sqlite3 = require("sqlite3").verbose();
 const { Pool } = require("pg");
 
 const app = express();
@@ -11,9 +10,10 @@ const appPassword = process.env.APP_PASSWORD || "orcamento";
 const dataDir = path.join(__dirname, "data");
 const dbPath = path.join(dataDir, "orcamentos.sqlite");
 const usePostgres = Boolean(process.env.POSTGRES_URL || process.env.POSTGRES_PRISMA_URL);
+const canUseSqlite = !usePostgres && !process.env.VERCEL;
 
 fs.mkdirSync(dataDir, { recursive: true });
-const sqliteDb = usePostgres ? null : new sqlite3.Database(dbPath);
+const sqliteDb = canUseSqlite ? new (require("sqlite3").verbose().Database)(dbPath) : null;
 const pgPool = usePostgres
   ? new Pool({
       connectionString: process.env.POSTGRES_URL || process.env.POSTGRES_PRISMA_URL,
@@ -27,6 +27,10 @@ function toPgSql(sql) {
 }
 
 async function initDb() {
+  if (!usePostgres && process.env.VERCEL) {
+    throw new Error("POSTGRES_URL nao configurada. Configure um banco PostgreSQL na Vercel para usar a aplicacao online.");
+  }
+
   if (usePostgres) {
     await pgPool.query(`
       CREATE TABLE IF NOT EXISTS orcamentos (
