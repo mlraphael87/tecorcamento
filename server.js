@@ -119,15 +119,6 @@ app.use((request, response, next) => {
   return response.status(401).send("Acesso restrito.");
 });
 
-app.use(async (_request, _response, next) => {
-  try {
-    await dbReady;
-    next();
-  } catch (error) {
-    next(error);
-  }
-});
-
 app.use(express.static(path.join(__dirname, "public")));
 
 function run(sql, params = []) {
@@ -197,6 +188,7 @@ function validatePayload(payload) {
 
 app.get("/api/next-os", async (_request, response, next) => {
   try {
+    await dbReady;
     response.json({ next: await nextOsNumero() });
   } catch (error) {
     next(error);
@@ -205,6 +197,7 @@ app.get("/api/next-os", async (_request, response, next) => {
 
 app.get("/api/orcamentos", async (request, response, next) => {
   try {
+    await dbReady;
     const q = `%${clean(request.query.q)}%`;
     const rows = await all(
       `
@@ -233,6 +226,7 @@ app.get("/api/orcamentos", async (request, response, next) => {
 
 app.get("/api/orcamentos/:id", async (request, response, next) => {
   try {
+    await dbReady;
     const row = await get("SELECT * FROM orcamentos WHERE id = ?", [request.params.id]);
     if (!row) return response.status(404).json({ error: "Orcamento nao encontrado." });
     response.json(row);
@@ -243,6 +237,7 @@ app.get("/api/orcamentos/:id", async (request, response, next) => {
 
 app.post("/api/orcamentos", async (request, response, next) => {
   try {
+    await dbReady;
     const payload = request.body || {};
     const errors = validatePayload(payload);
     if (errors.length) return response.status(400).json({ errors });
